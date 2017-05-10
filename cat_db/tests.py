@@ -57,3 +57,45 @@ class RelationshipTestCase(BaseTest):
             cat_toy_id=crinkle_tunnel.id
         )
         self.session.add(fav_toy)
+
+    def test_cat_cat_toy_relationship(self):
+        # establish a cat
+        gwen = Cat(
+            name='Gwen',
+            age=19,
+            coloring='tuxedo',
+            gender='female'
+        )
+        self.session.add(gwen)
+        self.session.flush()
+
+        # establish some toys she can play with
+        available_toys = [
+            'owl plush',
+            'feather boa',
+            'crinkle tunnel',
+            'squeaky mouse'
+        ]
+
+        for toy in available_toys:
+            toy = CatToy(name=toy)
+            self.session.add(toy)
+        self.session.flush()
+
+        # establish which ones she likes to play with best
+        gwens_fav_toys = ['owl plush', 'feather boa']
+
+        for toy_name in gwens_fav_toys:
+            fav_toy = self.session.query(CatToy).filter(CatToy.name == toy_name).one()
+            fav_toy_association = CatHasFavoriteToy(cat_id=gwen.id, cat_toy_id=fav_toy.id)
+            self.session.add(fav_toy_association)
+
+        # the CatHasFavoriteToys we just made for Gwen should now live in
+        # gwen.favorite_toy_associations
+        # is there the correct amount?
+        self.assertEqual(gwens_fav_toys, len(gwen.favorite_toy_associations))
+
+        # are they the correct ones?
+        for association in gwen.favorite_toy_associations:
+            cat_toy = self.session.query(CatToy).get(association.cat_toy_id)
+            self.assertTrue(cat_toy.name in gwens_fav_toys)
