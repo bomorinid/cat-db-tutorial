@@ -2,7 +2,7 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from __init__ import Base
 from unittest import TestCase
-from models import Cat, CatToy
+from models import Cat, CatToy, CatHasFavoriteToy
 
 
 class BaseTest(TestCase):
@@ -30,8 +30,30 @@ class ModelTestCase(BaseTest):
             coloring='tuxedo',
             gender='female'
         )
+        self.session.add(gwen)
 
     def test_add_cat_toy_function(self):
         # basic things about cat toys - they have names
 
         crinkle_tunnel = CatToy(name='crinkle tunnel')
+        self.session.add(crinkle_tunnel)
+
+
+class RelationshipTestCase(BaseTest):
+    def test_add_cat_favorite_toy(self):
+        gwen = Cat(
+            name='Gwen',
+            age=19,
+            coloring='tuxedo',
+            gender='female'
+        )
+        self.session.add(gwen)
+
+        crinkle_tunnel = CatToy(name='crinkle tunnel')
+        self.session.add(crinkle_tunnel)
+
+        fav_toy = CatHasFavoriteToy(
+            cat_id=gwen.id,
+            cat_toy_id=crinkle_tunnel.id
+        )
+        self.session.add(fav_toy)
