@@ -89,13 +89,13 @@ class RelationshipTestCase(BaseTest):
             fav_toy = self.session.query(CatToy).filter(CatToy.name == toy_name).one()
             fav_toy_association = CatHasFavoriteToy(cat_id=gwen.id, cat_toy_id=fav_toy.id)
             self.session.add(fav_toy_association)
-
-        # the CatHasFavoriteToys we just made for Gwen should now live in
-        # gwen.favorite_toy_associations
+        self.session.flush()
+        # the CatToy objects related to the CatHasFavoriteToys
+        # we just made for Gwen should now live in
+        # gwen.toys
         # is there the correct amount?
-        self.assertEqual(gwens_fav_toys, len(gwen.favorite_toy_associations))
+        self.assertEqual(len(gwens_fav_toys), len(gwen.toys))
 
         # are they the correct ones?
-        for association in gwen.favorite_toy_associations:
-            cat_toy = self.session.query(CatToy).get(association.cat_toy_id)
+        for cat_toy in gwen.toys:
             self.assertTrue(cat_toy.name in gwens_fav_toys)

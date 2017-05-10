@@ -31,5 +31,5 @@ for toy_name in gwens_fav_toys:
     fav_toy_association = CatHasFavoriteToy(cat_id=gwen.id, cat_toy_id=fav_toy.id)
     session.add(fav_toy_association)
 
-gwens_toys = session.query(CatToy).filter(CatToy.id.in_([ta.cat_toy_id for ta in gwen.favorite_toy_associations])).all()
-print gwens_toys
+session.commit()
+print gwen.toys
